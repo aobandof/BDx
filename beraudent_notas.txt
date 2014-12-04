@@ -1,1 +1,2 @@
 - habria que hacer algo con los trabajos a sucursales de regiones, ya qque si no tienen un arancel especial, crear nueva tabla envio que cobre los envios realizados (alli no se si sera por trabajos o por envio)
+- para la tabla Abono_Cargo, considerar un correlativo 
