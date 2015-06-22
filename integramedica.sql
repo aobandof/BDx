@@ -55,6 +55,20 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `beraudent`.`Datos_Facturacion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `beraudent`.`Datos_Facturacion` (
+  `id_dato_fact` INT NOT NULL AUTO_INCREMENT,
+  `razo_dato_fact` VARCHAR(45) NULL,
+  `fant_dato_fact` VARCHAR(45) NULL,
+  `dire_dato_fact` VARCHAR(45) NULL,
+  `rut_dato_fact` VARCHAR(45) NULL,
+  `deta_dato_fact` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_dato_fact`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `beraudent`.`Sucursal`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `beraudent`.`Sucursal` (
@@ -64,15 +78,22 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Sucursal` (
   `nomb_sucu` VARCHAR(25) NOT NULL,
   `alia_sucu` VARCHAR(45) NULL,
   `Arancel_id_aran` INT NOT NULL,
-  `Cliente_id_clie` INT NOT NULL,
   `Ubicacion_id_ubic` INT NOT NULL,
+  `Cliente_id_clie` INT NOT NULL,
+  `Datos_Facturacion_id_dato_fact` INT NOT NULL,
   PRIMARY KEY (`id_sucu`),
   INDEX `fk_Sucursal_Arancel1_idx` (`Arancel_id_aran` ASC),
-  INDEX `fk_Sucursal_Cliente1_idx` (`Cliente_id_clie` ASC),
   INDEX `fk_Sucursal_Ubicacion1_idx` (`Ubicacion_id_ubic` ASC),
+  INDEX `fk_Sucursal_Cliente1_idx` (`Cliente_id_clie` ASC),
+  INDEX `fk_Sucursal_Datos_Facturacion1_idx` (`Datos_Facturacion_id_dato_fact` ASC),
   CONSTRAINT `fk_Sucursal_Arancel1`
     FOREIGN KEY (`Arancel_id_aran`)
     REFERENCES `beraudent`.`Arancel` (`id_aran`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Sucursal_Ubicacion1`
+    FOREIGN KEY (`Ubicacion_id_ubic`)
+    REFERENCES `beraudent`.`Ubicacion` (`id_ubic`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Sucursal_Cliente1`
@@ -80,9 +101,9 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Sucursal` (
     REFERENCES `beraudent`.`Cliente` (`id_clie`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Sucursal_Ubicacion1`
-    FOREIGN KEY (`Ubicacion_id_ubic`)
-    REFERENCES `beraudent`.`Ubicacion` (`id_ubic`)
+  CONSTRAINT `fk_Sucursal_Datos_Facturacion1`
+    FOREIGN KEY (`Datos_Facturacion_id_dato_fact`)
+    REFERENCES `beraudent`.`Datos_Facturacion` (`id_dato_fact`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -92,7 +113,7 @@ ENGINE = InnoDB;
 -- Table `beraudent`.`Odontologo`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `beraudent`.`Odontologo` (
-  `id_odon` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_odon` INT NOT NULL AUTO_INCREMENT,
   `apel_odon` VARCHAR(45) NULL,
   `nomb_odon` VARCHAR(45) NULL,
   `mail_odon` VARCHAR(25) NULL,
@@ -112,10 +133,10 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Administrativo` (
   `celu_admi` VARCHAR(10) NULL,
   `carg_admi` VARCHAR(15) NULL,
   `tele_admi` VARCHAR(10) NULL,
-  `Cliente_id_clie` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`id_admi`, `Cliente_id_clie`),
-  INDEX `fk_Administrativo_Cliente1_idx` (`Cliente_id_clie` ASC),
-  CONSTRAINT `fk_Administrativo_Cliente1`
+  `Cliente_id_clie` INT NOT NULL,
+  PRIMARY KEY (`id_admi`),
+  INDEX `fk_Cliente_id_clie_idx` (`Cliente_id_clie` ASC),
+  CONSTRAINT `fk_Cliente_id_clie`
     FOREIGN KEY (`Cliente_id_clie`)
     REFERENCES `beraudent`.`Cliente` (`id_clie`)
     ON DELETE NO ACTION
@@ -192,28 +213,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `beraudent`.`Sucursal_Odontologo`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `beraudent`.`Sucursal_Odontologo` (
-  `Sucursal_id_sucu` INT NOT NULL,
-  `Odontologo_id_odon` INT NOT NULL,
-  PRIMARY KEY (`Sucursal_id_sucu`, `Odontologo_id_odon`),
-  INDEX `fk_Sucursal_has_Doctor_Sucursal1_idx` (`Sucursal_id_sucu` ASC),
-  INDEX `fk_Sucursal_Odontologo_Odontologo1_idx` (`Odontologo_id_odon` ASC),
-  CONSTRAINT `fk_Sucursal_has_Doctor_Sucursal1`
-    FOREIGN KEY (`Sucursal_id_sucu`)
-    REFERENCES `beraudent`.`Sucursal` (`id_sucu`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Sucursal_Odontologo_Odontologo1`
-    FOREIGN KEY (`Odontologo_id_odon`)
-    REFERENCES `beraudent`.`Odontologo` (`id_odon`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `beraudent`.`Personal`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `beraudent`.`Personal` (
@@ -262,25 +261,47 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `beraudent`.`Sucursal_Odontologo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `beraudent`.`Sucursal_Odontologo` (
+  `Sucursal_id_sucu` INT NOT NULL,
+  `Odontologo_id_odon` INT NOT NULL,
+  PRIMARY KEY (`Sucursal_id_sucu`, `Odontologo_id_odon`),
+  INDEX `fk_Sucursal_has_Odontologo_Odontologo1_idx` (`Odontologo_id_odon` ASC),
+  INDEX `fk_Sucursal_has_Odontologo_Sucursal1_idx` (`Sucursal_id_sucu` ASC),
+  CONSTRAINT `fk_Sucursal_has_Odontologo_Sucursal1`
+    FOREIGN KEY (`Sucursal_id_sucu`)
+    REFERENCES `beraudent`.`Sucursal` (`id_sucu`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Sucursal_has_Odontologo_Odontologo1`
+    FOREIGN KEY (`Odontologo_id_odon`)
+    REFERENCES `beraudent`.`Odontologo` (`id_odon`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `beraudent`.`Solicitud_Pedido`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `beraudent`.`Solicitud_Pedido` (
   `nume_soli_pedi` VARCHAR(10) NOT NULL,
   `fech_soli_pedi` VARCHAR(45) NOT NULL,
-  `Sucursal_Odontologo_Sucursal_id_sucu` INT UNSIGNED NOT NULL,
-  `Sucursal_Odontologo_Odontologo_id_odon` INT UNSIGNED NOT NULL,
   `Paciente_id_paciente` INT UNSIGNED NOT NULL,
+  `Sucursal_Odontologo_Sucursal_id_sucu` INT NOT NULL,
+  `Sucursal_Odontologo_Odontologo_id_odon` INT NOT NULL,
   PRIMARY KEY (`nume_soli_pedi`),
-  INDEX `fk_Pedido_Sucursal_Odontologo1_idx` (`Sucursal_Odontologo_Sucursal_id_sucu` ASC, `Sucursal_Odontologo_Odontologo_id_odon` ASC),
   INDEX `fk_Pedido_Paciente1_idx` (`Paciente_id_paciente` ASC),
-  CONSTRAINT `fk_Pedido_Sucursal_Odontologo1`
-    FOREIGN KEY (`Sucursal_Odontologo_Sucursal_id_sucu` , `Sucursal_Odontologo_Odontologo_id_odon`)
-    REFERENCES `beraudent`.`Sucursal_Odontologo` (`Sucursal_id_sucu` , `Odontologo_id_odon`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+  INDEX `fk_Solicitud_Pedido_Sucursal_Odontologo1_idx` (`Sucursal_Odontologo_Sucursal_id_sucu` ASC, `Sucursal_Odontologo_Odontologo_id_odon` ASC),
   CONSTRAINT `fk_Pedido_Paciente1`
     FOREIGN KEY (`Paciente_id_paciente`)
     REFERENCES `beraudent`.`Paciente` (`id_paciente`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Solicitud_Pedido_Sucursal_Odontologo1`
+    FOREIGN KEY (`Sucursal_Odontologo_Sucursal_id_sucu` , `Sucursal_Odontologo_Odontologo_id_odon`)
+    REFERENCES `beraudent`.`Sucursal_Odontologo` (`Sucursal_id_sucu` , `Odontologo_id_odon`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -314,20 +335,36 @@ ENGINE = InnoDB;
 -- Table `beraudent`.`Excepcion_Arancel`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `beraudent`.`Excepcion_Arancel` (
-  `Sucursal_id_sucu` INT NOT NULL,
-  `Arancel_Trabajo_Trabajo_id_trab` INT NOT NULL,
-  `Arancel_Trabajo_Arancel_id_aran` INT NOT NULL,
-  `prec_exce_aran` FLOAT NOT NULL COMMENT 'Si la sucursal del cliente usa un arancel base pero difiere solo en algunas prestaciones, entonces este sera el precio personalizado',
-  PRIMARY KEY (`Sucursal_id_sucu`, `Arancel_Trabajo_Trabajo_id_trab`, `Arancel_Trabajo_Arancel_id_aran`),
-  INDEX `fk_Excepcion_Arancel_Arancel_Trabajo1_idx` (`Arancel_Trabajo_Trabajo_id_trab` ASC, `Arancel_Trabajo_Arancel_id_aran` ASC),
-  CONSTRAINT `fk_Excepcion_Arancel_Sucursal1`
-    FOREIGN KEY (`Sucursal_id_sucu`)
-    REFERENCES `beraudent`.`Sucursal` (`id_sucu`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Excepcion_Arancel_Arancel_Trabajo1`
-    FOREIGN KEY (`Arancel_Trabajo_Trabajo_id_trab` , `Arancel_Trabajo_Arancel_id_aran`)
-    REFERENCES `beraudent`.`Arancel_Trabajo` (`Trabajo_id_trab` , `Arancel_id_aran`)
+  `prec_exce_aran` FLOAT NOT NULL COMMENT 'Si la sucursal del cliente usa un arancel base pero difiere solo en algunas prestaciones, entonces este sera el precio personalizado')
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `beraudent`.`Comprobante`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `beraudent`.`Comprobante` (
+  `nume_comp` VARCHAR(10) NOT NULL,
+  `tipo_comp` ENUM('F', 'B', 'FE', 'BE', 'NC', 'ND') NOT NULL,
+  `deta_comp` VARCHAR(45) NULL,
+  `fech_comp` VARCHAR(45) NULL,
+  PRIMARY KEY (`nume_comp`, `tipo_comp`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `beraudent`.`Orden_Compra`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `beraudent`.`Orden_Compra` (
+  `nume_orde_comp` VARCHAR(10) NOT NULL,
+  `fecha_orde_comp` DATETIME NULL,
+  `mont_orde_comp` FLOAT NULL,
+  `deta_orde_comp` VARCHAR(45) NULL,
+  `Comprobante_nume_comp` VARCHAR(10) NOT NULL,
+  INDEX `fk_Orden_Compra_Comprobante1_idx` (`Comprobante_nume_comp` ASC),
+  PRIMARY KEY (`nume_orde_comp`),
+  CONSTRAINT `fk_Orden_Compra_Comprobante1`
+    FOREIGN KEY (`Comprobante_nume_comp`)
+    REFERENCES `beraudent`.`Comprobante` (`nume_comp`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -348,9 +385,11 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Prestacion` (
   `deta_pres` VARCHAR(45) NULL,
   `Arancel_Trabajo_Trabajo_id_trab` INT NOT NULL,
   `Arancel_Trabajo_Arancel_id_aran` INT NOT NULL,
+  `Orden_Compra_nume_orde_comp` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`Solicitud_Pedido_nume_soli_pedi`, `posi_pres`),
   INDEX `fk_Prestacion_Orden_Pedido1_idx` (`Solicitud_Pedido_nume_soli_pedi` ASC),
   INDEX `fk_Prestacion_Arancel_Trabajo1_idx` (`Arancel_Trabajo_Trabajo_id_trab` ASC, `Arancel_Trabajo_Arancel_id_aran` ASC),
+  INDEX `fk_Prestacion_Orden_Compra1_idx` (`Orden_Compra_nume_orde_comp` ASC),
   CONSTRAINT `fk_Prestacion_Orden_Pedido1`
     FOREIGN KEY (`Solicitud_Pedido_nume_soli_pedi`)
     REFERENCES `beraudent`.`Solicitud_Pedido` (`nume_soli_pedi`)
@@ -359,6 +398,11 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Prestacion` (
   CONSTRAINT `fk_Prestacion_Arancel_Trabajo1`
     FOREIGN KEY (`Arancel_Trabajo_Trabajo_id_trab` , `Arancel_Trabajo_Arancel_id_aran`)
     REFERENCES `beraudent`.`Arancel_Trabajo` (`Trabajo_id_trab` , `Arancel_id_aran`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Prestacion_Orden_Compra1`
+    FOREIGN KEY (`Orden_Compra_nume_orde_comp`)
+    REFERENCES `beraudent`.`Orden_Compra` (`nume_orde_comp`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -372,96 +416,27 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Trabajo_Realizado` (
   `piez_trab_real` VARCHAR(5) NULL,
   `deta_trab_real` VARCHAR(45) NULL,
   `Orden_Trabajo_num_orde_trab` INT NOT NULL,
+  `colo_trab_real` VARCHAR(45) NULL,
+  `Trabajo_id_trab` INT NOT NULL,
   `Prestacion_Solicitud_Pedido_nume_soli_pedi` VARCHAR(10) NOT NULL,
   `Prestacion_posi_pres` TINYINT(1) UNSIGNED NOT NULL,
-  `Trabajo_id_trab` INT UNSIGNED NOT NULL,
-  `colo_trab_real` VARCHAR(45) NULL,
-  INDEX `fk_Trabajo_Pedido_Prestacion1_idx` (`Prestacion_Solicitud_Pedido_nume_soli_pedi` ASC, `Prestacion_posi_pres` ASC),
-  INDEX `fk_Trabajo_Pedido_Trabajo1_idx` (`Trabajo_id_trab` ASC),
   INDEX `fk_Trabajo_Pedido_Orden_Trabajo1_idx` (`Orden_Trabajo_num_orde_trab` ASC),
   PRIMARY KEY (`id_trab_real`),
-  CONSTRAINT `fk_Trabajo_Pedido_Prestacion1`
-    FOREIGN KEY (`Prestacion_Solicitud_Pedido_nume_soli_pedi` , `Prestacion_posi_pres`)
-    REFERENCES `beraudent`.`Prestacion` (`Solicitud_Pedido_nume_soli_pedi` , `posi_pres`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Trabajo_Pedido_Trabajo1`
-    FOREIGN KEY (`Trabajo_id_trab`)
-    REFERENCES `beraudent`.`Trabajo` (`id_trab`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+  INDEX `fk_Trabajo_Realizado_Trabajo1_idx` (`Trabajo_id_trab` ASC),
+  INDEX `fk_Trabajo_Realizado_Prestacion1_idx` (`Prestacion_Solicitud_Pedido_nume_soli_pedi` ASC, `Prestacion_posi_pres` ASC),
   CONSTRAINT `fk_Trabajo_Pedido_Orden_Trabajo1`
     FOREIGN KEY (`Orden_Trabajo_num_orde_trab`)
     REFERENCES `beraudent`.`Orden_Trabajo` (`num_orde_trab`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `beraudent`.`Datos_Facturacion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `beraudent`.`Datos_Facturacion` (
-  `id_dato_fact` INT NOT NULL AUTO_INCREMENT,
-  `razo_dato_fact` VARCHAR(45) NULL,
-  `fant_dato_fact` VARCHAR(45) NULL,
-  `dire_dato_fact` VARCHAR(45) NULL,
-  `rut_dato_fact` VARCHAR(45) NULL,
-  `deta_dato_fact` VARCHAR(45) NULL,
-  PRIMARY KEY (`id_dato_fact`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `beraudent`.`Orden_Compra`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `beraudent`.`Orden_Compra` (
-  `id_orde_comp` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nume_orde_comp` VARCHAR(10) NOT NULL,
-  `fecha_orde_comp` DATETIME NULL,
-  `mont_orde_comp` FLOAT NULL,
-  `deta_orde_comp` VARCHAR(45) NULL,
-  PRIMARY KEY (`id_orde_comp`),
-  UNIQUE INDEX `nume_orde_comp_UNIQUE` (`nume_orde_comp` ASC))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `beraudent`.`Pagos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `beraudent`.`Pagos` (
-  `id_pago` INT NOT NULL,
-  `tipo_pago` ENUM('E', 'T', 'R', 'W', 'D', 'CH') NULL DEFAULT 'D',
-  `num_pago` VARCHAR(20) NULL,
-  `fech_pago` DATETIME NULL,
-  `banc_pago` VARCHAR(45) NULL,
-  `deta_pago` VARCHAR(45) NULL,
-  `nume_reci_pago` VARCHAR(8) NULL,
-  PRIMARY KEY (`id_pago`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `beraudent`.`Comprobante`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `beraudent`.`Comprobante` (
-  `nume_comp` VARCHAR(10) NOT NULL,
-  `deta_comp` VARCHAR(45) NULL,
-  `fech_comp` VARCHAR(45) NOT NULL,
-  `tipo_comp` ENUM('F', 'B', 'FE', 'BE', 'NC', 'ND') NULL DEFAULT 'FE',
-  `Orden_Pago_id_orde_pago` INT NOT NULL,
-  `Pagos_id_pago` INT NOT NULL,
-  PRIMARY KEY (`nume_comp`),
-  INDEX `fk_Comprobante_Orden_Pago1_idx` (`Orden_Pago_id_orde_pago` ASC),
-  INDEX `fk_Comprobante_Pagos1_idx` (`Pagos_id_pago` ASC),
-  CONSTRAINT `fk_Comprobante_Orden_Pago1`
-    FOREIGN KEY (`Orden_Pago_id_orde_pago`)
-    REFERENCES `beraudent`.`Orden_Compra` (`id_orde_comp`)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Trabajo_Realizado_Trabajo1`
+    FOREIGN KEY (`Trabajo_id_trab`)
+    REFERENCES `beraudent`.`Trabajo` (`id_trab`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Comprobante_Pagos1`
-    FOREIGN KEY (`Pagos_id_pago`)
-    REFERENCES `beraudent`.`Pagos` (`id_pago`)
+  CONSTRAINT `fk_Trabajo_Realizado_Prestacion1`
+    FOREIGN KEY (`Prestacion_Solicitud_Pedido_nume_soli_pedi` , `Prestacion_posi_pres`)
+    REFERENCES `beraudent`.`Prestacion` (`Solicitud_Pedido_nume_soli_pedi` , `posi_pres`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -477,36 +452,19 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Abono_Cargo` (
   `Trabajo_Pedido_Arancel_Trabajo_Arancel_id_aran` INT NOT NULL,
   `Orden_Compra_id_orde_comp` INT UNSIGNED NOT NULL,
   `mont_abon_carg` INT NULL,
-  PRIMARY KEY (`id_abon_carg`),
-  INDEX `fk_Abono_Cargo_Orden_Compra1_idx` (`Orden_Compra_id_orde_comp` ASC),
-  CONSTRAINT `fk_Abono_Cargo_Orden_Compra1`
-    FOREIGN KEY (`Orden_Compra_id_orde_comp`)
-    REFERENCES `beraudent`.`Orden_Compra` (`id_orde_comp`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (`id_abon_carg`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `beraudent`.`Prestacion_has_Orden_Compra`
+-- Table `beraudent`.`Pago`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `beraudent`.`Prestacion_has_Orden_Compra` (
-  `Prestacion_Solicitud_Pedido_nume_soli_pedi` VARCHAR(10) NOT NULL,
-  `Prestacion_posi_pres` TINYINT(1) UNSIGNED NOT NULL,
-  `Orden_Compra_id_orde_comp` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`Prestacion_Solicitud_Pedido_nume_soli_pedi`, `Prestacion_posi_pres`, `Orden_Compra_id_orde_comp`),
-  INDEX `fk_Prestacion_has_Orden_Compra_Orden_Compra1_idx` (`Orden_Compra_id_orde_comp` ASC),
-  INDEX `fk_Prestacion_has_Orden_Compra_Prestacion1_idx` (`Prestacion_Solicitud_Pedido_nume_soli_pedi` ASC, `Prestacion_posi_pres` ASC),
-  CONSTRAINT `fk_Prestacion_has_Orden_Compra_Prestacion1`
-    FOREIGN KEY (`Prestacion_Solicitud_Pedido_nume_soli_pedi` , `Prestacion_posi_pres`)
-    REFERENCES `beraudent`.`Prestacion` (`Solicitud_Pedido_nume_soli_pedi` , `posi_pres`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Prestacion_has_Orden_Compra_Orden_Compra1`
-    FOREIGN KEY (`Orden_Compra_id_orde_comp`)
-    REFERENCES `beraudent`.`Orden_Compra` (`id_orde_comp`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+CREATE TABLE IF NOT EXISTS `beraudent`.`Pago` (
+  `id_pago` INT NOT NULL,
+  `nume_reci_pago` VARCHAR(8) NULL,
+  `fech_reci_pago` DATETIME NULL,
+  `deta_pago` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_pago`))
 ENGINE = InnoDB;
 
 
@@ -546,6 +504,46 @@ CREATE TABLE IF NOT EXISTS `beraudent`.`Usuario` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `beraudent`.`Pago_Comprobante`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `beraudent`.`Pago_Comprobante` (
+  `id_pago_comp` INT NOT NULL AUTO_INCREMENT,
+  `tipo_pago_comp` ENUM('EF', 'CH', 'DE', 'TF', 'TB', 'WP', 'PP') NOT NULL DEFAULT 'CH',
+  `nume_pago_comp` VARCHAR(15) NULL,
+  `fecha_pago_comp` DATETIME NULL,
+  `fecha_venci_pago_comp` VARCHAR(45) NULL,
+  `banc_pago_comp` VARCHAR(45) NULL,
+  `Comprobante_nume_comp` VARCHAR(10) NOT NULL,
+  `Comprobante_tipo_comp` ENUM('F', 'B', 'FE', 'BE', 'NC', 'ND') NOT NULL,
+  `Pago_id_pago` INT NOT NULL,
+  PRIMARY KEY (`id_pago_comp`),
+  INDEX `fk_Pago_Comprobante_Comprobante1_idx` (`Comprobante_nume_comp` ASC, `Comprobante_tipo_comp` ASC),
+  INDEX `fk_Pago_Comprobante_Pago1_idx` (`Pago_id_pago` ASC),
+  CONSTRAINT `fk_Pago_Comprobante_Comprobante1`
+    FOREIGN KEY (`Comprobante_nume_comp` , `Comprobante_tipo_comp`)
+    REFERENCES `beraudent`.`Comprobante` (`nume_comp` , `tipo_comp`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Pago_Comprobante_Pago1`
+    FOREIGN KEY (`Pago_id_pago`)
+    REFERENCES `beraudent`.`Pago` (`id_pago`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `beraudent`.`Usuario`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `beraudent`;
+INSERT INTO `beraudent`.`Usuario` (`id_usua`, `apel_usua`, `nomb_usua`, `nick_usua`, `pass_usua`, `priv_usua`) VALUES (DEFAULT, 'OBANDO FLORIAN', 'ABEL RAFAEL', 'ofaber', '123456', 'A');
+INSERT INTO `beraudent`.`Usuario` (`id_usua`, `apel_usua`, `nomb_usua`, `nick_usua`, `pass_usua`, `priv_usua`) VALUES (DEFAULT, 'QUIROZ ANDRADE', 'CARMEN DEL PILAR', 'cpilar', '123456', 'L');
+
+COMMIT;
+
