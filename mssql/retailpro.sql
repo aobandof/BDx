@@ -213,3 +213,13 @@ convert(varchar,GETDATE()-1,105) AS [Fecha termino], CAST(SUM(t0.onhand) as int)
 CAST(SUM(t0.onhand) AS int) AS [Inventario en unidades], CAST(SUM(t0.onhand)  *  max(t2.AvgPrice) as int) AS [Inventario en Valor], CAST(SUM(t0.onhand) as int) * 0 AS [Venta Total en Valor Costo] 
 from Stock.dbo.Kayser_OITW as t0 inner join Stock.dbo.Kayser_OWHS as t3 on t3.WhsCode=t0.WhsCode COLLATE Modern_Spanish_CS_AS inner join Stock.dbo.Kayser_OITM as t2 on t0.ItemCode=t2.ItemCode  COLLATE Modern_Spanish_CS_AS 
 where t3.U_GSP_SENDTPV='Y' GROUP BY t0.ItemCode, t0.WhsCode, t3.WhsName  ORDER BY t0.ItemCode
+
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+SELECT top 10 SKU AS [Codigo Producto], Art AS [Descripcion Producto], Almacen AS [Codigo Local], WhsName AS [Descripcion Local], CONVERT(VARCHAR(10),U_GSP_CADATA,105) AS [Fecha Inicio], 
+CONVERT(VARCHAR(10),U_GSP_CADATA,105) AS [Fecha termino], CAST(sum(VentaU) AS INT) AS [Venta total unidades], CAST(sum(NetoU) AS INT) AS [Venta Total en Valor], 
+CAST(sum(StockCM * 0) AS INT) AS [Inventario en unidades], CAST(sum(StockCM * 0) AS INT) AS [Inventario en Valor], CAST(sum(VentaU * t1.AVGPRICE) AS INT) AS [Venta Total en Valor Costo] , 
+CAST(ROUND(t1.AVGPRICE,0) AS INT) AS Costo 
+FROM Gsp_SboKayserDetalle t0 INNER JOIN OITM t1 on t1.ITEMCODE=t0.SKU 
+where U_GSP_CADATA>=CONVERT(date, GETDATE() - 7, 102) group by SKU,Art,Almacen,WhsName,U_GSP_CADATA, t1.AVGPRICE

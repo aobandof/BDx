@@ -91,3 +91,9 @@ SELECT Bodega as  cod_tienda, Almacen FROM [GSP].[dbo].[Gsp_SboKayserResumen]  w
 SELECT Bodega as cod_tienda, Almacen FROM [GSP].[dbo].[Gsp_SboKayserResumen] where fecha=CONVERT(datetime, '2018-01-01', 20) AND Horas>=CONVERT(datetime, '16:00:00', 20) group by Bodega, Almacen
 
 SELECT  WhsCode as cod_tienda, WhsName as tienda FROM [192.168.0.33].[SBO_KAYSER].[dbo].[OWHS] where U_GSP_SENDTPV = 'Y'
+
+-- COMPILADO CONSULTAS:
+
+--- opcion = busqueda
+SELECT WhsCode AS cod_tienda, WhsName AS tienda from OWHS where U_GSP_SENDTPV = 'Y' AND WhsCode!='013' ORDER BY WhsCode
+SELECT bodega as cod_tienda, CAST(SUM(Total) AS INT) AS total FROM [GSP].[dbo].[Gsp_SboKayserResumen] where fecha=CONVERT(datetime, '2018-07-03', 20) AND Horas<=CONVERT(datetime, '14:15:25', 20) group by Almacen, Bodega ORDER BY total DESC
